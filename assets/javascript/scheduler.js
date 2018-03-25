@@ -14,6 +14,36 @@ var destination = "";
 var firstTrainTime = "";
 var frequency = 0;
 
+var now = "";
+var minutesAway = 0;
+var lastTrain = "";
+var nextTrain = "";
+
+function calcNextArrival() {
+    now = moment();
+    lastTrain = (now.diff(firstTrainTime, "minutes", true)) % frequency;
+    nextTrain = lastTrain + frequency;
+}
+
+function displaySchedule() {
+
+    database.ref().on("child_added", function (snapshot) {
+
+        $("#train-schedule").append(`
+            <tr>
+                <td>${snapshot.val().trainName}</th>
+                <td>${snapshot.val().destination}</td>
+                <td>${snapshot.val().frequency}</td>
+                <td>${snapshot.val().nextTrain}</td>
+                <td>${snapshot.val().minutesAway}</td>
+            </tr>
+        `)
+
+    }, function (errorObject) {
+        console.log("Errors handled: " + errorObject.code);
+    });
+}
+
 function processTrainInfo() {
     event.preventDefault();
 
@@ -22,25 +52,32 @@ function processTrainInfo() {
     firstTrainTime = $("#first-train-time").val().trim();
     frequency = $("#frequency").val().trim();
 
-    var newTrain = {
-        trainName: trainName,
-        destination: destination,
-        firstTrainTime: firstTrainTime,
-        frequency: frequency
+
+    if (!moment(firstTrainTime, "HH:mm").isValid()) {
+        console.log("First Train Time must be 24hr time");
+    } else if (frequency < 0) {
+        console.log("Frequency must be a number greater than 0")
+    } else {
+        var train = {
+            trainName: trainName,
+            destination: destination,
+            firstTrainTime: firstTrainTime,
+            frequency: frequency
+        }
+
+        database.ref().push(train);
+
+        $("#train-name").val("");
+        $("#destination").val("");
+        $("#first-train-time").val("");
+        $("#frequency").val("");
+
+        calcNextArrival();
+
+        minutesAway = nextTrain.diff(now, "minutes");
+
+        displaySchedule();
     }
-
-    console.log(database.ref().push(newTrain));
-
-    $("#train-name").val(" ");
-    $("#destination").val(" ");
-    $("#first-train-time").val(" ");
-    $("#frequency").val(" ");
-
-    console.log("got here");
 }
-
-
-
-
 
 $("#train-submit").on("click", processTrainInfo);
