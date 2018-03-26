@@ -9,31 +9,32 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
 
-        <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
-    
+
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     <title>Train Scheduler</title>
 </head>
 
 <body>
-    <div class="container">
-        <div class="jumbotron jumbotron-fluid m-4">
+    <div class="container mx-auto p-5">
+        <div class="jumbotron jumbotron-fluid m-4 light-blue-background">
             <div class="container">
                 <h1 class="display-4 text-center">
-                    Train Scheduler
+                    Train Schedule
                 </h1>
                 <p class="lead text-center">
-                    Stupid Logo
+                    Travel By Rail
                 </p>
             </div>
         </div>
 
         <div class="card m-4">
-            <div class="card-header">
+            <div class="card-header light-blue-background">
                 Current Train Schedule
             </div>
-            <div id="train-schedule-home" class="card-body">
+            <div id="train-schedule-home" class="card-body silver-background">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -52,10 +53,10 @@
         </div>
 
         <div class="card m-4">
-            <div class="card-header">
+            <div class="card-header light-blue-background">
                 Add Train
             </div>
-            <div id="train-input" class="card-body">
+            <div id="train-input" class="card-body silver-background">
                 <form>
                     <div class="form-group">
                         <label for="train-name">Train Name</label>
@@ -73,12 +74,13 @@
                         <label for="frequency">Frequency (min)</label>
                         <input type="number" class="form-control" id="frequency" placeholder="00">
                     </div>
-                    <button type="submit" id="train-submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" id="train-submit" class="btn button-color">Submit</button>
                 </form>
             </div>
         </div>
     </div>
-    
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"

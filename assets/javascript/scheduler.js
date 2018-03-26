@@ -57,8 +57,8 @@ function calcNextArrival() {
     minutesAway = frequency - lastTrainMinutesAgo;
     nextTrain = moment().add(minutesAway, "minutes");
 
-    firstTrainTime = moment(firstTrainTime).format("HH:mm");
     nextTrain = moment(nextTrain).format("HH:mm");
+    firstTrainTime = moment(firstTrainTime).format("HH:mm");
 }
 
 function displaySchedule(childSnapshot, prevChildKey) {
@@ -74,6 +74,47 @@ function displaySchedule(childSnapshot, prevChildKey) {
     `)
 }
 
+// Couldn't get this part to work
+
+// function updateTime() {
+//     $("#train-schedule").empty();
+
+//     database.ref().once("value", function(snapshot) {
+//         console.log(snapshot);
+
+//         snapshot.forEach(function(childSnapshot) {
+//             trainName = childSnapshot.val().trainName;
+//             destination = childSnapshot.val().destination;
+//             firstTrainTime = childSnapshot.val().firstTrainTime;
+//             frequency = childSnapshot.val().frequency;
+//             nextTrain = childSnapshot.val().nextTrain;
+//             minutesAway = childSnapshot.val().minutesAway;
+//             var key = childSnapshot.key;
+
+//             calcNextArrival();
+
+//             database.ref(`${key}`).update({
+//                 nextTrain: nextTrain,
+//                 minutesAway: minutesAway
+//             });
+
+//             $("#train-schedule").append(`
+//                 <tr>
+//                     <td>${trainName}</td>
+//                     <td>${destination}</td>
+//                     <td>${frequency}</td>
+//                     <td>${nextTrain}</td>
+//                     <td>${minutesAway}</td>
+//                 </tr>
+//             `)
+//         })
+
+
+//     });
+
+    
+// }
+
 $("#train-submit").on("click", persistTrainInfo);
 
 database.ref().on("child_added", function (childSnapshot, prevChildKey) {
@@ -82,4 +123,8 @@ database.ref().on("child_added", function (childSnapshot, prevChildKey) {
 }, function (errorObject) {
     console.log("Errors handled: " + errorObject.code);
 });
+
+// setInterval(updateTime, 60000);
+
+
 
