@@ -13,56 +13,32 @@ var trainName = "";
 var destination = "";
 var firstTrainTime = "";
 var frequency = 0;
-
-var now = "";
 var minutesAway = 0;
-var lastTrain = "";
+var lastTrainMinutesAgo = 0;
 var nextTrain = "";
 
-function calcNextArrival() {
-    now = moment();
-    lastTrain = (now.diff(firstTrainTime, "minutes", true)) % frequency;
-    nextTrain = lastTrain + frequency;
-}
-
-function displaySchedule() {
-
-    database.ref().on("child_added", function (snapshot) {
-
-        $("#train-schedule").append(`
-            <tr>
-                <td>${snapshot.val().trainName}</th>
-                <td>${snapshot.val().destination}</td>
-                <td>${snapshot.val().frequency}</td>
-                <td>${snapshot.val().nextTrain}</td>
-                <td>${snapshot.val().minutesAway}</td>
-            </tr>
-        `)
-
-    }, function (errorObject) {
-        console.log("Errors handled: " + errorObject.code);
-    });
-}
-
-function processTrainInfo() {
+function persistTrainInfo() {
     event.preventDefault();
 
     trainName = $("#train-name").val().trim();
     destination = $("#destination").val().trim();
     firstTrainTime = $("#first-train-time").val().trim();
-    frequency = $("#frequency").val().trim();
-
+    frequency = parseInt($("#frequency").val().trim());
 
     if (!moment(firstTrainTime, "HH:mm").isValid()) {
         console.log("First Train Time must be 24hr time");
     } else if (frequency < 0) {
         console.log("Frequency must be a number greater than 0")
     } else {
+        calcNextArrival();
+
         var train = {
             trainName: trainName,
             destination: destination,
             firstTrainTime: firstTrainTime,
-            frequency: frequency
+            frequency: frequency,
+            nextTrain: nextTrain,
+            minutesAway: minutesAway
         }
 
         database.ref().push(train);
@@ -71,13 +47,39 @@ function processTrainInfo() {
         $("#destination").val("");
         $("#first-train-time").val("");
         $("#frequency").val("");
-
-        calcNextArrival();
-
-        minutesAway = nextTrain.diff(now, "minutes");
-
-        displaySchedule();
     }
 }
 
-$("#train-submit").on("click", processTrainInfo);
+function calcNextArrival() {
+    firstTrainTime = moment(firstTrainTime, "HH:mm").subtract(1, "years");
+
+    lastTrainMinutesAgo = (moment().diff(firstTrainTime, "minutes")) % frequency;
+    minutesAway = frequency - lastTrainMinutesAgo;
+    nextTrain = moment().add(minutesAway, "minutes");
+
+    firstTrainTime = moment(firstTrainTime).format("HH:mm");
+    nextTrain = moment(nextTrain).format("HH:mm");
+}
+
+function displaySchedule(childSnapshot, prevChildKey) {
+
+    $("#train-schedule").append(`
+        <tr>
+            <td>${childSnapshot.val().trainName}</td>
+            <td>${childSnapshot.val().destination}</td>
+            <td>${childSnapshot.val().frequency}</td>
+            <td>${childSnapshot.val().nextTrain}</td>
+            <td>${childSnapshot.val().minutesAway}</td>
+        </tr>
+    `)
+}
+
+$("#train-submit").on("click", persistTrainInfo);
+
+database.ref().on("child_added", function (childSnapshot, prevChildKey) {
+    displaySchedule(childSnapshot, prevChildKey);
+
+}, function (errorObject) {
+    console.log("Errors handled: " + errorObject.code);
+});
+
