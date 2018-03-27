@@ -17,7 +17,7 @@ var minutesAway = 0;
 var lastTrainMinutesAgo = 0;
 var nextTrain = "";
 
-function persistTrainInfo() {
+function addNewTrain() {
     event.preventDefault();
 
     trainName = $("#train-name").val().trim();
@@ -61,70 +61,56 @@ function calcNextArrival() {
     firstTrainTime = moment(firstTrainTime).format("HH:mm");
 }
 
-function displaySchedule(childSnapshot, prevChildKey) {
+function displaySchedule(snapshot) {
+    $("#train-schedule").empty();
 
-    $("#train-schedule").append(`
-        <tr>
-            <td>${childSnapshot.val().trainName}</td>
-            <td>${childSnapshot.val().destination}</td>
-            <td>${childSnapshot.val().frequency}</td>
-            <td>${childSnapshot.val().nextTrain}</td>
-            <td>${childSnapshot.val().minutesAway}</td>
-        </tr>
-    `)
+    snapshot.forEach(function (childSnapshot) {
+        $("#train-schedule").append(`
+            <tr>
+                <td>${childSnapshot.val().trainName}</td>
+                <td>${childSnapshot.val().destination}</td>
+                <td>${childSnapshot.val().frequency}</td>
+                <td>${childSnapshot.val().nextTrain}</td>
+                <td>${childSnapshot.val().minutesAway}</td>
+            </tr>
+        `)
+    })
 }
 
-// Couldn't get this part to work
+function updateTime() {
+    database.ref().once("value", function (snapshot) {
+        console.log(snapshot);
 
-// function updateTime() {
-//     $("#train-schedule").empty();
+        snapshot.forEach(function (childSnapshot) {
+            trainName = childSnapshot.val().trainName;
+            destination = childSnapshot.val().destination;
+            firstTrainTime = childSnapshot.val().firstTrainTime;
+            frequency = childSnapshot.val().frequency;
+            nextTrain = childSnapshot.val().nextTrain;
+            minutesAway = childSnapshot.val().minutesAway;
+            var key = childSnapshot.key;
 
-//     database.ref().once("value", function(snapshot) {
-//         console.log(snapshot);
+            calcNextArrival();
 
-//         snapshot.forEach(function(childSnapshot) {
-//             trainName = childSnapshot.val().trainName;
-//             destination = childSnapshot.val().destination;
-//             firstTrainTime = childSnapshot.val().firstTrainTime;
-//             frequency = childSnapshot.val().frequency;
-//             nextTrain = childSnapshot.val().nextTrain;
-//             minutesAway = childSnapshot.val().minutesAway;
-//             var key = childSnapshot.key;
+            database.ref(key).update({
+                nextTrain: nextTrain,
+                minutesAway: minutesAway
+            });
+        })
+    });
+}
 
-//             calcNextArrival();
+$("#train-submit").on("click", addNewTrain);
 
-//             database.ref(`${key}`).update({
-//                 nextTrain: nextTrain,
-//                 minutesAway: minutesAway
-//             });
-
-//             $("#train-schedule").append(`
-//                 <tr>
-//                     <td>${trainName}</td>
-//                     <td>${destination}</td>
-//                     <td>${frequency}</td>
-//                     <td>${nextTrain}</td>
-//                     <td>${minutesAway}</td>
-//                 </tr>
-//             `)
-//         })
-
-
-//     });
-
-    
-// }
-
-$("#train-submit").on("click", persistTrainInfo);
-
-database.ref().on("child_added", function (childSnapshot, prevChildKey) {
-    displaySchedule(childSnapshot, prevChildKey);
+database.ref().on("value", function (snapshot) {
+    displaySchedule(snapshot);
 
 }, function (errorObject) {
     console.log("Errors handled: " + errorObject.code);
 });
 
 // setInterval(updateTime, 60000);
+$(window).on("load", updateTime);
 
 
 
