@@ -4,7 +4,8 @@ var config = {
     databaseURL: "https://train-scheduler-76099.firebaseio.com",
     projectId: "train-scheduler-76099",
     storageBucket: "train-scheduler-76099.appspot.com",
-    messagingSenderId: "665838281193"
+    messagingSenderId: "665838281193",
+    appId: "1:665838281193:web:40f0bdd721b7c2e6352b78"
 };
 firebase.initializeApp(config);
 var database = firebase.database();
